@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payslip</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 40px 20px; }
+
+    .payslip {
+      background: white; width: 720px;
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1a1a2e, #4f46e5);
+      padding: 32px 40px; color: white;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .header p  { font-size: 13px; opacity: 0.8; }
+    .header .payslip-label {
+      text-align: right;
+      background: rgba(255,255,255,0.15);
+      padding: 10px 20px; border-radius: 8px;
+    }
+    .header .payslip-label h2 { font-size: 18px; }
+    .header .payslip-label p  { font-size: 12px; opacity: 0.8; }
+
+    /* Employee info */
+    .emp-info {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0; border-bottom: 1px solid #eee;
+    }
+    .emp-info .block { padding: 24px 40px; }
+    .emp-info .block:first-child { border-right: 1px solid #eee; }
+    .emp-info label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+    .emp-info strong { font-size: 15px; color: #1a1a2e; }
+
+    /* Salary table */
+    .salary-section { padding: 24px 40px; }
+    .salary-section h3 { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    .salary-table th { background: #f8f9fa; padding: 10px 16px; text-align: left; font-size: 12px; color: #666; border-bottom: 2px solid #eee; }
+    .salary-table td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
+    .salary-table tr:last-child td { border-bottom: none; }
+    .salary-table .amount { text-align: right; font-weight: 500; }
+    .salary-table .green { color: #16a34a; }
+    .salary-table .red   { color: #dc2626; }
+
+    /* Net salary */
+    .net-box {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      border-radius: 10px; padding: 20px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px;
+    }
+    .net-box p  { color: rgba(255,255,255,0.8); font-size: 13px; }
+    .net-box h2 { color: white; font-size: 28px; font-weight: 700; }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid #eee; padding: 20px 40px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer p { font-size: 12px; color: #999; }
+    .signature { text-align: center; }
+    .signature .line { width: 160px; border-top: 1px solid #333; margin-bottom: 6px; }
+    .signature p { font-size: 12px; color: #555; }
+
+    /* Print button */
+    .print-bar {
+      display: flex; gap: 12px; justify-content: center;
+      margin-top: 24px; padding-bottom: 40px;
+    }
+    .btn-print {
+      padding: 12px 32px; background: #4f46e5; color: white;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-size: 15px; font-weight: 500;
+    }
+    .btn-print:hover { background: #4338ca; }
+    .btn-back {
+      padding: 12px 32px; background: #f0f0f0; color: #333;
+      border: none; border-radius: 8px; cursor: pointer; font-size: 15px;
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .payslip { box-shadow: none; border-radius: 0; }
+      .print-bar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div>
+    <div class="payslip" id="payslip">
+
+      <!-- Header -->
+      <div class="header">
+        <div>
+          <h1>💼 ELLE.</h1>
+<p>Born to serve, Build to lead</p>        </div>
+        <div class="payslip-label">
+          <h2>PAYSLIP</h2>
+          <p id="slip-month">Month: -</p>
+        </div>
+      </div>
+
+      <!-- Employee Info -->
+      <div class="emp-info">
+        <div class="block">
+          <label>Employee Name</label>
+          <strong id="slip-name">-</strong>
+        </div>
+        <div class="block">
+          <label>Generated On</label>
+          <strong id="slip-date">-</strong>
+        </div>
+        <div class="block" style="border-top:1px solid #eee">
+          <label>Designation</label>
+          <strong id="slip-designation">-</strong>
+        </div>
+        <div class="block" style="border-top:1px solid #eee; border-right:none">
+          <label>Payment Status</label>
+          <strong style="color:#16a34a">✅ Paid</strong>
+        </div>
+      </div>
+
+      <!-- Salary Breakdown -->
+      <div class="salary-section">
+        <h3>Salary Breakdown</h3>
+
+        <table class="salary-table">
+          <thead>
+            <tr>
+              <th>Earnings</th>
+              <th class="amount">Amount</th>
+              <th>Deductions</th>
+              <th class="amount">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Basic Salary</td>
+              <td class="amount green" id="slip-basic">₹0</td>
+              <td>Total Deductions</td>
+              <td class="amount red" id="slip-deductions">₹0</td>
+            </tr>
+            <tr>
+              <td>Allowances</td>
+              <td class="amount green" id="slip-allowances">₹0</td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td><strong>Gross Salary</strong></td>
+              <td class="amount green" id="slip-gross"><strong>₹0</strong></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Net Salary Box -->
+        <div class="net-box">
+          <div>
+            <p>Net Salary (Take Home)</p>
+            <h2 id="slip-net">₹0</h2>
+          </div>
+          <div style="text-align:right">
+            <p style="color:rgba(255,255,255,0.7)">Month</p>
+            <p style="color:white;font-size:16px;font-weight:600" id="slip-month2">-</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div>
+          <p>This is a computer generated payslip.</p>
+          <p>No signature required.</p>
+        </div>
+        <div class="signature">
+          <div class="line"></div>
+          <p>Authorized Signatory</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="print-bar">
+      <button class="btn-back" onclick="window.history.back()">← Back</button>
+      <button class="btn-print" onclick="window.print()">🖨️ Print Payslip</button>
+    </div>
+  </div>
+
+  <script>
+    // Get data from URL params
+    const params = new URLSearchParams(window.location.search);
+
+    const name       = params.get('name') || 'Employee';
+    const month      = params.get('month') || '-';
+    const basic      = parseFloat(params.get('basic')) || 0;
+    const allowances = parseFloat(params.get('allowances')) || 0;
+    const deductions = parseFloat(params.get('deductions')) || 0;
+    const net        = parseFloat(params.get('net')) || 0;
+    const date       = params.get('date') || '-';
+    const designation = params.get('designation') || 'Employee';
+
+    const gross = basic + allowances;
+
+    document.getElementById('slip-name').textContent        = name;
+    document.getElementById('slip-month').textContent       = 'Month: ' + month;
+    document.getElementById('slip-month2').textContent      = month;
+    document.getElementById('slip-date').textContent        = new Date(date).toLocaleDateString();
+    document.getElementById('slip-designation').textContent = designation;
+    document.getElementById('slip-basic').textContent       = '₹' + basic.toLocaleString();
+    document.getElementById('slip-allowances').textContent  = '₹' + allowances.toLocaleString();
+    document.getElementById('slip-deductions').textContent  = '₹' + deductions.toLocaleString();
+    document.getElementById('slip-gross').innerHTML         = '<strong>₹' + gross.toLocaleString() + '</strong>';
+    document.getElementById('slip-net').textContent         = '₹' + net.toLocaleString();
+    function generatePayslip(p) {
+  const params = new URLSearchParams({
+    name:        p.employee_name,
+    month:       p.month,
+    basic:       p.basic,
+    allowances:  p.allowances,
+    deductions:  p.deductions,
+    net:         p.net_salary,
+    date:        p.generated_on,
+    designation: 'Employee'
+  });
+  window.open(`payslip.html?${params.toString()}`, '_blank');
+}
+  </script>
+</body>
+</html>
